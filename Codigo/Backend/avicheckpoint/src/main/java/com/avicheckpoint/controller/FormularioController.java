@@ -2,7 +2,11 @@ package com.avicheckpoint.controller;
 
 import com.avicheckpoint.dto.FormularioRequestDTO;
 import com.avicheckpoint.dto.FormularioResponseDTO;
+import com.avicheckpoint.model.FormularioResposta;
+import com.avicheckpoint.service.AnaliseService;
 import com.avicheckpoint.service.FormularioService;
+
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +26,9 @@ public class FormularioController {
     
     @Autowired
     private FormularioService formularioService;
+    
+    @Autowired
+    private AnaliseService analiseService;
     
     /**
      * Salva um novo formulário (rascunho ou completo).
@@ -134,11 +141,62 @@ public class FormularioController {
     }
     
     /**
+     * Analisa um formulário submetido e gera resultado.
+     * POST /api/formularios/{formularioId}/analisar
+     */
+    @PostMapping("/{formularioId}/analisar")
+    public ResponseEntity<FormularioResponseDTO> analisarFormulario(
+            @PathVariable String formularioId) {
+        try {
+            FormularioResposta formularioAnalisado = 
+                analiseService.analisarFormulario(formularioId);
+            
+            FormularioResponseDTO resposta = mapearParaResponse(formularioAnalisado);
+            return ResponseEntity.ok(resposta);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
      * Endpoint para teste de conectividade.
      * GET /api/formularios/health
      */
     @GetMapping("/health")
     public ResponseEntity<String> health() {
         return ResponseEntity.ok("Formulários API funcionando!");
+    }
+    
+    /**
+     * Método auxiliar para mapear FormularioResposta para FormularioResponseDTO.
+     */
+    private FormularioResponseDTO mapearParaResponse(FormularioResposta formulario) {
+        FormularioResponseDTO dto = new FormularioResponseDTO();
+        dto.setFormularioId(formulario.getFormularioId());
+        dto.setProdutorId(formulario.getProdutorId());
+        dto.setDataPreenchimento(formulario.getDataPreenchimento());
+        dto.setDataAtualizacao(formulario.getDataAtualizacao());
+        dto.setStatus(formulario.getStatus());
+        dto.setRespostas(formulario.getRespostas());
+        dto.setResultado(formulario.getResultado());
+        dto.setCompleto(isFormularioCompleto(formulario.getRespostas()));
+        
+        return dto;
+    }
+    
+    /**
+     * Verifica se um formulário está completo.
+     */
+    private boolean isFormularioCompleto(Map<String, Object> respostas) {
+        if (respostas == null) {
+            return false;
+        }
+        
+        return respostas.containsKey("saude") && 
+               respostas.containsKey("nutricao") && 
+               respostas.containsKey("avaliacao") && 
+               respostas.containsKey("doencas");
     }
 }

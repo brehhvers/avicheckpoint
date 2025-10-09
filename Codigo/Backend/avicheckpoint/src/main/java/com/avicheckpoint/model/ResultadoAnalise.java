@@ -1,6 +1,7 @@
 package com.avicheckpoint.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -39,6 +40,11 @@ public class ResultadoAnalise {
      * Lista de veterinários recomendados na região.
      */
     private List<VeterinarioRecomendado> veterinariosProximos = new ArrayList<>();
+    
+    /**
+     * Pontuação geral da análise (0-100).
+     */
+    private Integer pontuacaoGeral;
     
     // Constructors
     public ResultadoAnalise() {}
@@ -90,6 +96,10 @@ public class ResultadoAnalise {
     
     public void setVeterinariosProximos(List<VeterinarioRecomendado> veterinariosProximos) {
         this.veterinariosProximos = veterinariosProximos;
+    }
+    
+    public Integer getPontuacaoGeral() {
+        return pontuacaoGeral;
     }
     
     // Métodos utilitários para adicionar itens
@@ -170,6 +180,34 @@ public class ResultadoAnalise {
         
         public void setBio(String bio) {
             this.bio = bio;
+        }
+    }
+    
+    // Setters adicionais para AnaliseService
+    public void setPontuacaoGeral(Integer pontuacaoGeral) {
+        this.pontuacaoGeral = pontuacaoGeral;
+    }
+    
+    public void setPanoramaGeral(String panoramaGeral) {
+        // Converter string para lista para compatibilidade
+        this.panorama = Arrays.asList(panoramaGeral);
+    }
+    
+    public void setPontosAMelhorar(List<String> pontosAMelhorar) {
+        this.melhorias = pontosAMelhorar;
+    }
+    
+    public void setAlertas(List<String> alertas) {
+        // Adicionar alertas aos comentários
+        if (this.comentarios == null) {
+            this.comentarios = new ArrayList<>();
+        }
+        this.comentarios.addAll(alertas);
+    }
+    
+    public void setProfissionaisRecomendados(List<String> profissionaisRecomendados) {
+        if (!profissionaisRecomendados.isEmpty()) {
+            this.profissaoRecomendada = String.join(", ", profissionaisRecomendados);
         }
     }
 }
