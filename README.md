@@ -23,8 +23,6 @@ O **Avicheckpoint** é uma plataforma completa desenvolvida para produtores aví
 Este projeto foi implementado seguindo a metodologia **RIPER** (Research → Innovate → Plan → Execute → Review), garantindo:
 - Arquitetura sólida e escalável
 - Código limpo e bem documentado
-- Testes e validações em cada fase
-- Integração perfeita com frontend
 
 ---
 
